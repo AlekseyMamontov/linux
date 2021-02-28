@@ -1221,7 +1221,12 @@ static int mcp251x_open(struct net_device *net)
 	INIT_WORK(&priv->tx_work, mcp251x_tx_work_handler);
 	INIT_WORK(&priv->restart_work, mcp251x_restart_work_handler);
 
-	ret = mcp251x_hw_wake(spi);
+	/* ret = mcp251x_hw_wake(spi);
+	Call this subroutine leads to a hang in the terminal on sunxi H3 boards  when entering the command
+	ip link set can0 up type can bitrate 500000  or  ifconfig can0 up
+	return to call  mcp251x_hw_reset (spi) fixes the problem*/
+	ret = mcp251x_hw_reset (spi);
+	
 	if (ret)
 		goto out_free_wq;
 	ret = mcp251x_setup(net, spi);
